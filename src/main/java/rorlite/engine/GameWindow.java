@@ -10,9 +10,9 @@ public final class GameWindow {
     public long handle;
     public int width = 1280, height = 720;
 
-    private final boolean[] keys = new boolean[GLFW.KEY_LAST];
-    private final boolean[] pressedThisFrame = new boolean[GLFW.KEY_LAST];
-    private final boolean[] releasedThisFrame = new boolean[GLFW.KEY_LAST];
+    private final boolean[] keys = new boolean[GLFW.GLFW_KEY_LAST + 1];
+    private final boolean[] pressedThisFrame = new boolean[GLFW.GLFW_KEY_LAST + 1];
+    private final boolean[] releasedThisFrame = new boolean[GLFW.GLFW_KEY_LAST + 1];
 
     private double mouseX, mouseY;
     private boolean mousePressed, mouseReleased, mouseHeld;
@@ -46,7 +46,7 @@ public final class GameWindow {
 
     public void pollEvents() { glfwPollEvents(); }
     public void swapBuffers() { glfwSwapBuffers(handle); }
-    public boolean shouldClose() { return glfwShouldWindowClose(handle); }
+    public boolean shouldClose() { return glfwWindowShouldClose(handle); }
     public void setShouldClose(boolean v) { glfwSetWindowShouldClose(handle, v); }
 
     /** Вызывать в конце кадра — сбрасывает одноразовые флаги. */
@@ -79,7 +79,7 @@ public final class GameWindow {
     }
 
     public void close() {
-        freeWindowCallbacks(handle);
+        glfwFreeCallbacks(handle);
         glfwDestroyWindow(handle);
         glfwTerminate();
     }

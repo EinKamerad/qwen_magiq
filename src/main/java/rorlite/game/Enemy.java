@@ -30,7 +30,7 @@ public class Enemy extends Entity {
     double thinkTimer;
     int jumpCooldown;
     double wanderDir = 1;
-    double flightPhase = Rng.d(0, Math.PI * 2);
+    public double flightPhase = Rng.d(0, Math.PI * 2);
     // Для босса: фазы
     public int bossPhase = 0;
     public double bossSpecialTimer = 5;

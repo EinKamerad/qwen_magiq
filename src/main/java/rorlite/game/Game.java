@@ -253,7 +253,7 @@ public class Game {
 
     // ------------------------------------------------------------------
     private void handlePlayerInput(float dt) {
-        if (!player.alive) return;
+        if (!player.alive || win == null) return; // headless-режим (смоуктест): без ввода
         CharacterDef def = player.def;
         double left = win.keyDown(GLFW_KEY_A) || win.keyDown(GLFW_KEY_LEFT) ? -1 : 0;
         double right = win.keyDown(GLFW_KEY_D) || win.keyDown(GLFW_KEY_RIGHT) ? 1 : 0;
@@ -576,7 +576,8 @@ public class Game {
 
     public void spawnDamageNumber(Vec2 at, double amount, boolean good) {
         String s = String.valueOf((int) Math.round(amount));
-        texts.add(Fx.floatText(s, at.x + Rng.d(-0.4, 0.4), at.y - at.y * 0 , good ? 1 : 1, good ? 0.95 : 1, good ? 0.9 : 0.3, good ? 0.4 : 0.3, 14));
+        texts.add(Fx.floatText(s, at.x + Rng.d(-0.4, 0.4), at.y,
+                good ? 1 : 1, good ? 0.95 : 1, good ? 0.9 : 0.3, 14));
     }
 
     public void spawnFloatingText(double x, double y, String text, double cr, double cg, double cb) {

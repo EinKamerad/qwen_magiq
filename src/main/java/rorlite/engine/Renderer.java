@@ -18,7 +18,7 @@ import static org.lwjgl.stb.STBTruetype.*;
  */
 public final class Renderer {
 
-    private static STBTTFontinfo FONT_INFO = null;
+    private static final org.lwjgl.stb.STBTTFontinfo FONT_INFO = org.lwjgl.stb.STBTTFontinfo.create();
     private static ByteBuffer FONT_DATA = null;
     private static float fontScalePx = 24f;
 
@@ -50,7 +50,7 @@ public final class Renderer {
                 byte[] bytes = java.nio.file.Files.readAllBytes(f.toPath());
                 FONT_DATA = ByteBuffer.allocateDirect(bytes.length);
                 FONT_DATA.put(bytes).flip();
-                if (stbtt_Init(FONT_INFO, FONT_DATA)) {
+                if (stbtt_InitFont(FONT_INFO, FONT_DATA)) {
                     System.out.println("[Renderer] Шрифт загружен: " + p);
                     return;
                 }
@@ -63,14 +63,15 @@ public final class Renderer {
     public static boolean saveTextPng(String text, String path, int pxSize) {
         if (FONT_DATA == null) return false;
         try (MemoryStack stack = MemoryStack.stackPush()) {
-            IntBuffer iw = stack.mallocInt(1), ih = stack.mallocInt(1), ic = stack.mallocInt(1);
             // вычислим размеры
-            float scale = stbtt_ScaleForPixelHeight(pxSize);
+            float scale = stbtt_ScaleForPixelHeight(FONT_INFO, pxSize);
             int[] asc = new int[1], desc = new int[1], lead = new int[1];
             stbtt_GetFontVMetrics(FONT_INFO, asc, desc, lead);
-            int w = (int) (stbtt_GetCodepointWidth(text.charAt(0), 0) * text.length() * scale) + 8;
+            int[] advance = new int[1], lsb = new int[1];
+            stbtt_GetCodepointHMetrics(FONT_INFO, text.codePointAt(0), advance, lsb);
+            int w = (int) (advance[0] * scale * text.length()) + 8;
             int h = (int) ((asc[0] - desc[0]) * scale) + 8;
-            ByteBuffer buf = ByteBuffer.allocate(w * h);
+            ByteBuffer buf = ByteBuffer.allocateDirect(w * h);
             stbtt_MakeCodepointBitmap(FONT_INFO, buf, w, h, 1, scale, scale, text.codePointAt(0));
             // Полный рендер строки не делаем — просто сохраним первый глиф как доказательство работы шрифта
             return stbi_write_png(path, w, h, 1, buf, w);
